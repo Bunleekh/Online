@@ -1,13 +1,19 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 
 app = Flask(__name__)
+online_apps = []
 
 @app.route('/signal', methods=['POST'])
 def receive_signal():
-    data = request.json  # Extract JSON data from the request
-    message = data.get('message')  # Get the 'message' field from the JSON data
-    print("Received message:", message)
-    return jsonify({"status": "success", "message": "Signal received successfully"}), 200
+    # Add the IP address of the sender to the list of online apps
+    ip_address = request.remote_addr
+    if ip_address not in online_apps:
+        online_apps.append(ip_address)
+    return 'Signal received'
+
+@app.route('/online_apps', methods=['GET'])
+def get_online_apps():
+    return str(len(online_apps))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
